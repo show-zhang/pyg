@@ -56,13 +56,24 @@ export default {
         email: '',
         mobile: '',
         id: -1
-      }
+      },
+      // 分配角色
+      isShowUserRoleDialog: false,
+      userRoleForm: {
+        username: '',
+        rid: '',
+        id: -1
+      },
+      // 所有角色列表数据
+      rolesList: []
     }
   },
   created () {
     // 进入页面，获取第一页数据
     // 因为第一页是默认值，因此，不需要传入参数
     this.getUsersList()
+    // 获取所有角色列表
+    this.getRoleList()
   },
   methods: {
     // 获取用户列表数据
@@ -254,6 +265,44 @@ export default {
       // 刷新页面
       this.getUsersList(1, this.searchText)
       // 弹出提示消息
+      this.$message({
+        type: 'success',
+        message: res.data.meta.msg
+      })
+    },
+    // 展示分配角色对话框
+    async showUserRole (curUser) {
+      this.isShowUserRoleDialog = true
+      // console.log('this.rolesList', this.rolesList)
+
+      // 选中角色列表 Rid是角色id
+      // 说明：当前用户数据中没有 角色id 值，所以，需要重新获取当前用户的角色id
+      const res = await this.$http.get(`users/${curUser.id}`)
+      // console.log('curUser', curUser)
+      console.log('curUser', res)
+      this.userRoleForm.rid = res.data.data.rid === -1 ? '' : res.data.data.rid
+      // 展示用户名称
+      this.userRoleForm.username = curUser.username
+      // 暂存用户id
+      this.userRoleForm.id = curUser.id
+      console.log('this.userRoleForm', this.userRoleForm)
+    },
+    // 获取所有角色列表
+    async getRoleList () {
+      const res = await this.$http.get('/roles')
+      this.rolesList = res.data.data
+    },
+    // 分配用户权限
+    async assignRole () {
+      const {rid, id} = this.userRoleForm
+      const res = await this.$http.put(`users/${id}/role`, {
+        rid
+      })
+      // 关闭对话框
+      this.isShowUserRoleDialog = false
+      // 刷新列表数据
+      this.getUsersList(1, this.searchText)
+      // 显示提示信息
       this.$message({
         type: 'success',
         message: res.data.meta.msg

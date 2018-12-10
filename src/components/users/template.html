@@ -52,7 +52,7 @@
           <el-button type="primary" plain icon="el-icon-edit" @click="showUserEditDialog(scope.row)" size="mini"></el-button>
           <!-- 删除 -->
           <el-button type="danger" plain icon="el-icon-delete" @click="delUser(scope.row.id)" size="mini"></el-button>
-          <el-button type="success" plain icon="el-icon-check" size="mini">分配角色</el-button>
+          <el-button type="success" plain icon="el-icon-check" size="mini" @click="showUserRole(scope.row)">分配角色</el-button>
       </template>
     </el-table-column>
  </el-table>
@@ -118,6 +118,34 @@
     <div slot="footer" class="dialog-footer">
       <el-button @click="isShowUserEditDialog = false">取 消</el-button>
       <el-button type="primary" @click="editUser">确 定</el-button>
+    </div>
+  </el-dialog>
+
+  <!-- 分配角色对话框 -->
+  <el-dialog title="分配角色" :visible.sync="isShowUserRoleDialog">
+    <el-form :model="userRoleForm">
+      <el-form-item label="角色名" label-width="80px">
+          <el-tag type="info">{{userRoleForm.username}}</el-tag>
+        <!-- <el-input v-model="userRoleForm.name" autocomplete="off"></el-input> -->
+      </el-form-item>
+      <el-form-item label="角色列表" label-width="80px">
+        <!-- <el-select v-model="userRoleForm.region" placeholder="请选择活动区域">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select> -->
+        <el-select v-model="userRoleForm.rid" placeholder="请选择角色">
+          <el-option
+          v-for="item in rolesList"
+          :key="item.id"
+          :label="item.roleName"
+          :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isShowUserRoleDialog = false">取 消</el-button>
+      <el-button type="primary" @click="assignRole">确 定</el-button>
     </div>
   </el-dialog>
 </div>
