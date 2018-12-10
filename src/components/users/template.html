@@ -1,0 +1,123 @@
+<div class="users">
+  <!-- 面包屑导航 -->
+  <el-breadcrumb class="bread" separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+  </el-breadcrumb>
+   <!-- 查询和添加 -->
+    <el-row :gutter="20">
+        <el-col :span="8">
+          <!-- 搜索框 -->
+          <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select">
+              <el-button slot="append" icon="el-icon-search" @click='search'></el-button>
+          </el-input>
+        </el-col>
+        <el-col :span="8">
+          <!-- 添加用户按钮 -->
+          <el-button type="success" plain @click="showUserAddDialog">添加用户</el-button>
+        </el-col>
+    </el-row>
+  <!-- 表格 -->
+   <el-table
+   :data="usersList"
+   style="width: 100%">
+    <el-table-column
+      prop="username"
+      label="姓名"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="email"
+      label="邮箱"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="mobile"
+      label="电话">
+    </el-table-column>
+    <el-table-column
+      prop="mg_state"
+      label="用户状态">
+      <template slot-scope="scope">
+        <!-- el-switch 中的 v-model 应该绑定当前数据中的 mg_state 数据 -->
+        <!-- 注意：通过 scope.row 可以获取到当前行的数据，scope.row.mg_state 就可以获取到当前用户的状态了 -->
+        <el-switch v-model="scope.row.mg_state" @change="changUseState(scope.row)"></el-switch>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作">
+      <template slot-scope="scope">
+        <!-- 自定义列内容： plain 空心样式 -->
+          <!-- 编辑 -->
+          <el-button type="primary" plain icon="el-icon-edit" @click="showUserEditDialog(scope.row)" size="mini"></el-button>
+          <!-- 删除 -->
+          <el-button type="danger" plain icon="el-icon-delete" @click="delUser(scope.row.id)" size="mini"></el-button>
+          <el-button type="success" plain icon="el-icon-check" size="mini">分配角色</el-button>
+      </template>
+    </el-table-column>
+ </el-table>
+   <!--
+    分页组件
+      background 是否为分页按钮添加背景色
+      layout 分页组件结构（ < 1 2 3 > ）
+      total 总条目数（数据总条数）
+      :page-size="3" 每页大小
+      :current-page="5" 当前页码
+      @current-change 页码改变的事件
+  -->
+ <el-pagination
+  background
+  layout="prev, pager, next"
+  :total="total"
+  :page-size="pagesize"
+  :current-page="pagenum"
+  @current-change="changePage">
+  <!-- current-change是分页插件提供的事件  changePage是自定义事件-->
+ </el-pagination>
+
+ <!-- 添加用户对话框 -->
+ <el-dialog
+  title="添加用户"
+  :visible.sync="isShowUserAddDialog" @close='closeUserAddDialog'>
+  <el-form :rules="userAddRules" :model="userAddForm" ref="userAddFormRef" label-width="100px">
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="userAddForm.username"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="userAddForm.password"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="userAddForm.email"></el-input>
+      </el-form-item>
+      <el-form-item label="手机" prop="mobile">
+        <el-input v-model="userAddForm.mobile"></el-input>
+      </el-form-item>
+
+    </el-form>
+    <!-- close 是Dialog对话框中的事件-->
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="isShowUserAddDialog = false">取 消</el-button>
+      <el-button type="primary" @click="addUser">确 定</el-button>
+    </span>
+  </el-dialog>
+
+ <!-- 编辑用户对话框 -->
+  <el-dialog title="编辑用户" :visible.sync="isShowUserEditDialog">
+    <el-form :model="userEditForm" label-width="100px">
+      <el-form-item label="用户名">
+          <el-tag type="info">{{userEditForm.username}}</el-tag>
+        <!-- <el-input v-model="userEditForm.username"></el-input> -->
+      </el-form-item>
+      <el-form-item label="邮箱" >
+        <el-input v-model="userEditForm.email"></el-input>
+      </el-form-item>
+      <el-form-item label="手机">
+        <el-input v-model="userEditForm.mobile"></el-input>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isShowUserEditDialog = false">取 消</el-button>
+      <el-button type="primary" @click="editUser">确 定</el-button>
+    </div>
+  </el-dialog>
+</div>

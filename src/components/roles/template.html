@@ -1,0 +1,125 @@
+<div class="roles">这是角色列表组件
+  <!-- 面包屑导航 -->
+  <el-breadcrumb class="bread" separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>权限管理</el-breadcrumb-item>
+      <el-breadcrumb-item>权限列表</el-breadcrumb-item>
+  </el-breadcrumb>
+
+  <el-row>
+    <el-button type="success" plain @click="ShowAddRolesDialog">添加角色</el-button>
+  </el-row>
+  <!-- 表格 -->
+  <!-- type="expand" 和 Scoped slot 可以开启展开行功能 -->
+
+  <el-table
+   :data="rolesList"
+   style="width: 100%">
+    <!-- 可展开行 -->
+    <el-table-column  type="expand">
+        <template slot-scope="scope">
+           <!-- 1 渲染一级权限 -->
+           <el-row v-for="level1 in scope.row.children" :key="level1.id" class="level1">
+              <!-- 展示一级权限名称： -->
+              <el-col :span='4'>
+                <el-tag closable>{{level1.authName}}</el-tag>
+                <i class="el-icon-arrow-right"></i>
+              </el-col>
+
+              <!-- 展示 二级和三级权限： -->
+              <el-col :span='20'>
+                <!-- 2 渲染二级权限 -->
+                <el-row v-for="level2 in level1.children" :key="level2.id" class="level2">
+                  <el-col :span='4'>
+                    <el-tag type="success" closable>{{level2.authName}}</el-tag>
+                    <i class="el-icon-arrow-right"></i>
+                  </el-col>
+
+                  <!-- 展示三级权限名称： -->
+                  <el-col :span='20'>
+                    <el-tag type="warning" class="level3" closable v-for="level3 in level2.children" :key="level3.id">{{level3.authName}}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </template>
+    </el-table-column>
+    <!-- 索引 -->
+    <el-table-column type="index" width="50px"> </el-table-column>
+    <el-table-column
+      label="角色名称"
+      prop="roleName" width="200px">
+    </el-table-column>
+    <el-table-column
+      label="描述"
+      prop="roleDesc" width="200px">
+    </el-table-column>
+    <el-table-column
+      label="操作">
+      <template slot-scope="scope">
+          <el-button type="primary" plain size="mini" icon="el-icon-edit" @click="showEditRolesDialog(scope.row)"></el-button>
+          <el-button type="danger" plain size="mini" icon="el-icon-delete" @click="delUse(scope.row.id)"></el-button>
+          <el-button type="success" plain size="mini" icon="el-icon-check" @click="showRolesDialog(scope.row)">分配权限</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+
+  <!-- 编辑角色的对话框 -->
+  <el-dialog title=角色管理 :visible.sync="isShowEditRolesDialog">
+    <el-form :model="editRoleform" label-width="100px">
+      <el-form-item label="角色名称">
+        <el-input v-model="editRoleform.roleName" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="描述">
+        <el-input v-model="editRoleform.roleDesc" autocomplete="off"></el-input>
+      </el-form-item>
+
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isShowEditRightDialog = false">取 消</el-button>
+      <el-button type="primary" @click="editRoles">确 定</el-button>
+    </div>
+  </el-dialog>
+
+  <!--添加角色的对话框 -->
+  <el-dialog title=角色添加 :visible.sync="isShowAddRolesDialog">
+      <el-form :model="AddRoleform">
+        <el-form-item label="角色名称">
+          <el-input v-model="AddRoleform.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="AddRoleform.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShowAddRolesDialog = false">取 消</el-button>
+        <el-button type="primary" @click="addRoles">确 定</el-button>
+      </div>
+    </el-dialog>
+
+ <!-- 分配权限的对话框 -->
+    <el-dialog title="角色授权" :visible.sync="isShowRolesDialog">
+      <!--
+        Tree 树形控件
+        :data="data2" 数据源，数据中通过 label 属性表示树形节点的名称；通过 children 属性来指定该节点的子节点
+        show-checkbox 添加该属性后，节点会带有复选框
+        :default-expanded-keys="[2, 3]" 设置默认展开的节点key（key对应数据中的id）
+        :default-checked-keys="[5]" 设置默认选中的节点key（id）
+        node-key="id" 使用数据中的哪个属性来表示每个节点的key值，一般就是唯一的id值
+        :props="defaultProps"
+        :default-expand-all="true" 是否默认展开所有节点
+       -->
+      <el-tree
+        ref='tree'
+        :data="rightsTree"
+        show-checkbox
+        :default-expand-all="true"
+        node-key="id"
+        :props="defaultProps">
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShowRolesDialog = false">取 消</el-button>
+        <el-button type="primary" @click="assignRights">确 定</el-button>
+      </div>
+    </el-dialog>
+</div>
