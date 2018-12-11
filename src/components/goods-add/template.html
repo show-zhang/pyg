@@ -1,0 +1,84 @@
+<div class="goodsAdd">这是 商品添加 组件
+   <!--
+    步骤条 el-steps
+      :active="active"  当前项激活的索引号，从 0 开始
+      finish-status="success"
+
+      el-step 每一个步骤
+        title 属性表示：该步骤的标题
+  -->
+  <el-steps  :active="stepActive" finish-status="success">
+    <el-step title="第一步" description="基本信息"></el-step>
+    <el-step title="第二步" description="上传图片"></el-step>
+    <el-step title="第三步" description="商品内容"></el-step>
+  </el-steps>
+  <!--
+    tabs 标签页
+   -->
+  <el-tabs v-model="tabActive" tab-position="left" @tab-click="changeTab">
+    <el-tab-pane label="基本信息" name="basic">
+        <el-form label-width="80px" :model="goodsAddForm">
+            <el-form-item label="商品名称">
+              <el-input v-model="goodsAddForm.goods_name"></el-input>
+            </el-form-item>
+            <el-form-item label="商品价格">
+              <el-input v-model="goodsAddForm.goods_price"></el-input>
+            </el-form-item>
+            <el-form-item label="商品重量">
+              <el-input v-model="goodsAddForm.goods_weight"></el-input>
+            </el-form-item>
+            <el-form-item label="商品数量">
+              <el-input v-model="goodsAddForm.goods_number"></el-input>
+            </el-form-item>
+            <el-form-item label="商品分类">
+              <!-- goodsAddForm.goods_cat 是一个数组-->
+              <el-cascader
+              :options="cateList"
+              v-model="goodsAddForm.goods_cat"
+              :props="{ label: 'cat_name', value: 'cat_id'}">
+              </el-cascader>
+            </el-form-item>
+            <el-form-item label="是否促销">
+                <!-- goodsAddForm.is_promote -->
+                <!--
+                  el-radio 单选框组件
+                    label="1" 表示当前 radio 选中的值
+                -->
+              <template>
+                <el-radio v-model="goodsAddForm.is_promote" :label="true">是</el-radio>
+                <el-radio v-model="goodsAddForm.is_promote" :label="false">否</el-radio>
+              </template>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="nextStep(1,'pic')">下一步</el-button>
+    </el-tab-pane>
+    <el-tab-pane label="图片内容" name="pic">
+       <!--
+        图片上传组件
+          action 指定图片上传接口地址
+          :on-preview 点击文件列表中已上传的文件时的钩子
+          :on-remove 文件列表移除文件时的钩子
+          :file-list="fileList2" 上传的文件列表
+          list-type="picture" 上传图片的外观样式
+          :on-success 文件上传成功时的回调函数
+          headers 设置上传的请求头部 object
+      -->
+        <el-upload
+          action="http://localhost:8888/api/private/v1/upload"
+          :headers = "uploadHeader"
+          list-type="picture-card"
+          :on-success="uploadSuccess">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+
+        <el-button  class="mt20" type="primary" @click="nextStep(2,'content')">下一步</el-button>
+    </el-tab-pane>
+    <el-tab-pane label="商品内容" name="content">
+      <!-- 富文本编辑器的使用 -->
+      <!-- 双向数据绑定 -->
+        <quill-editor class="introduce" v-model="goodsAddForm.goods_introduce"></quill-editor>
+        <el-button class="mt20" type="primary" @click="addGoods">确定</el-button>
+    </el-tab-pane>
+  </el-tabs>
+</div>

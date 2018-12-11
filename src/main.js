@@ -12,10 +12,20 @@ import 'element-ui/lib/theme-chalk/index.css'
 // 引入自定义的样式
 import '@/assets/css/index.css'
 
+// 导入第三方组件：表格展开
+// 教程中的导入方法，配置到全局
+// var ElTreeGrid = require('element-tree-grid');
+// Vue.component(ElTreeGrid.name,ElTreeGrid);
+
+import ElTreeGrid from 'element-tree-grid'
+
 // 导入axios
 import axios from 'axios'
 // 将 axios 添加到 Vue 原型中
 Vue.prototype.$http = axios
+// 注册全局组件：element-tree-grid
+// 注册后，就可以在任意的单文件组件中使用了
+Vue.component(ElTreeGrid.name, ElTreeGrid)
 
 // 配置基础路径
 axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/'

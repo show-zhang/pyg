@@ -49,7 +49,7 @@
         <el-menu
           :unique-opened="true"
           :router="true"
-          :default-active="$route.path.slice(1)"
+          :default-active="$route.path.split('/').length === 3 ? ('/' + $route.path.split('/')[1]): $route.path"
           class="el-menu-vertical-demo"
           background-color="#545c64"
           text-color="#fff"
@@ -83,7 +83,14 @@
             </template>
 
              <!-- 二级菜单 -->
-            <el-menu-item :index="level2.path" v-for="level2 in level1.children" :key="level2.id">
+              <!--
+              二级菜单
+              这个 index 没有添加 / ，后面会有bug
+              哈希值为： goods
+
+              注意：路由的哈希值应该都带有 / 开头！！！ 否则，可能会有问题
+            -->
+            <el-menu-item :index="'/'+ level2.path" v-for="level2 in level1.children" :key="level2.id">
               <i class="el-icon-menu"></i>
               <span slot="title">{{level2.authName}}</span>
             </el-menu-item>
@@ -138,7 +145,7 @@ export default {
     async getMenus () {
       const res = await this.$http.get('/menus')
       this.menus = res.data.data
-      console.log(res.data.data)
+      // console.log(res.data.data)
     }
   }
 }

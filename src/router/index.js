@@ -12,6 +12,9 @@ import Users from '@/components/users/Users.vue'
 import Roles from '@/components/roles/Roles.vue'
 import Rights from '@/components/rights/Rights.vue'
 import Categories from '@/components/categories/Categories.vue'
+import Goods from '@/components/goods/Goods.vue'
+import GoodsAdd from '@/components/goods-add/GoodsAdd.vue'
+import NotFound from '@/components/notfound/NotFound.vue'
 
 // 2 将路由作为Vue的插件安装
 Vue.use(VueRouter)
@@ -33,9 +36,23 @@ const router = new VueRouter({
         {path: '/users', component: Users},
         {path: '/roles', component: Roles},
         {path: '/rights', component: Rights},
-        {path: '/categories', component: Categories}
+        {path: '/categories', component: Categories},
+        /*
+          /goods/:page 表示使用了路由参数，用来动态匹配哈希值
+          :page 就是路由参数，我们使用这个参数，来匹配分页数值
+
+          :page? 表示这路由参数是可选的，可以有，也可以没有，这样就可以匹配：
+          1 /goods
+          2 /goods/6
+        */
+        {path: '/goods/:page?', component: Goods},
+        {path: '/goods-add', component: GoodsAdd}
       ]
-    }
+    },
+    // * 表示匹配所有路由，所以，一定要放在路由规则的最后！！！
+    // 添加该路由后，就可以匹配路由的哈希值了，如果是我们功能中有的，直接从上面的路由规则
+    // 如果是用户随意输入的，就直接跳转到 404 页面
+    {path: '*', component: NotFound}
   ]
 })
 
